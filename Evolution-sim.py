@@ -1,5 +1,4 @@
-#There is a youtube video showing how this works on my channel right here 
-#https://www.youtube.com/watch?v=KMeT2k1ytYs&lc=z13ne1urvyvhzbqf523jzl0ovtupxbzlw
+
 
 
 import pygame
