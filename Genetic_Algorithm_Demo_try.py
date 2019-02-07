@@ -14,13 +14,14 @@ def main():
     red = [255,0,0]
     green = [0,255,0]
     blue = [0,0,255]
-    fps = 100
+    fps = 60
     numBots = 100
-    numGenerations = 20
-    numChangePerLife = 20
+    numGenerations = 10
+    numChangePerLife = 100
     mutation_rate = 0.2
-    colour_change_rate = .05
-    colour_mutation_rate = 0.003
+    reproduction_rate = 0.005
+    colour_change_rate = 0.000003
+    colour_mutation_rate = 0.00005
     bots = []
     best_ever = 0
     best_ever_dna = []
@@ -30,14 +31,17 @@ def main():
     def acquiredChange(colour_code):
         # minus means moving towards black plus means moving towards white.
         percent_change = (random.random() * colour_change_rate)
-        newColourNumber = (percent_change * 255) + colour_code[0]
-        if(newColourNumber > 255):
-            newColourNumber = 255
-        elif(newColourNumber < 0):
-            newColourNumber = 0
+        print("We are changing the colour by: ", percent_change)
         #Move towards clearer colour
-        acquiredChanged_colour = (newColourNumber, newColourNumber, newColourNumber)
-        acquiredChanged_colour_code = [newColourNumber, newColourNumber, newColourNumber]
+        if(percent_change > 1):
+            acquiredChanged_colour = (min(max(((percent_change*255) + colour_code[0]) + colour_code[0],0),255), min(max(((percent_change*255) + colour_code[0]) +colour_code[1],0),255), min(max(((percent_change*255) + colour_code[0]) +colour_code[2],0),255))
+            acquiredChanged_colour_code = [min(max(((percent_change*255) + colour_code[0]) +colour_code[0],0),255), min(max(((percent_change*255) + colour_code[0]) +colour_code[1],0),255), min(max(((percent_change*255) + colour_code[0]) +colour_code[2],0),255)]
+        elif(percent_change<1):
+            acquiredChanged_colour = (max(min(((percent_change*255) + colour_code[0]) +colour_code[0],255),0), max(min(((percent_change*255) + colour_code[0]) +colour_code[1],255),0), max(min(((percent_change*255) + colour_code[0]) +colour_code[2],255),0))
+            acquiredChanged_colour_code = [max(min(((percent_change*255) + colour_code[0]) +colour_code[0],255),0), max(min(((percent_change*255) + colour_code[0]) +colour_code[1],255),0), max(min(((percent_change*255) + colour_code[0]) +colour_code[2],255),0)]
+        else:
+            acquiredChanged_colour = (colour_code[0],colour_code[1],colour_code[2])
+            acquiredChanged_colour_code = colour_code
         return(acquiredChanged_colour,acquiredChanged_colour_code)
     class create_bot(): #How to input dna????
         def __init__(self, x, y, dna=False):
@@ -70,9 +74,7 @@ def main():
                 #if it is a new bot, then set the color dna to be grey.
                 self.dna = gray
         def update(self):
-            
-            self.colour, self.colour_code = acquiredChange(self.colour_code)
-            
+            self.colour, self.colour_code = acquiredChange(self.colour_code)		
         def reproduce(self):
             bots.append(create_bot(self.position[0]+10, self.position[1]+10, self.dna))
         def draw_bot(self, x, y):
@@ -81,27 +83,21 @@ def main():
             botWidth = 10
             pygame.gfxdraw.aacircle(gameDisplay, xPos, yPos, botWidth, self.colour)
             pygame.gfxdraw.filled_circle(gameDisplay, xPos, yPos, botWidth, self.colour)
-            pygame.draw.circle(gameDisplay, black, (xPos,yPos), botWidth+1, 1)
-        def draw_best_dna(self, x, y):
-            xPos = (x * 20) + 600
-            yPos = (y * 20) + 35
-            botWidth = 10
-            pygame.gfxdraw.aacircle(gameDisplay, xPos, yPos, botWidth, self.dna)
-            pygame.gfxdraw.filled_circle(gameDisplay, xPos, yPos, botWidth, self.dna)
-            pygame.draw.circle(gameDisplay, black, (xPos,yPos), botWidth+1, 1)			
+            pygame.draw.circle(gameDisplay, black, (xPos,yPos), botWidth+1, 1)		
     #instantiation of bots
     for i in range(numBots):
         bots.append(create_bot(random.uniform(0,game_width),random.uniform(0,game_height)))
     running = True
     countGen = 1
     countChange = 0
-    generationBest = []
     while(running):
         gameDisplay.fill(white)
+        pygame.gfxdraw.aacircle(gameDisplay, 200, 200, 10, (127,127,127))
+        pygame.gfxdraw.filled_circle(gameDisplay, 200, 200, 10, (127,127,127))
+        pygame.draw.circle(gameDisplay, black, (200,200), 10, 1)
         #set limit of generations.
-        if(countGen > numGenerations):
+        if(countGen >= numGenerations):
             running = False
-            pygame.quit()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -111,42 +107,34 @@ def main():
             bot.update()
             bot.draw_bot(count,countGen)
             count += 1	
-        count = 1
-        ycount = 1
-                
         #set limit of acquired changes.
         if(countChange >= numChangePerLife):
+            print("The number of bots is = ",len(bots), "The last for loop got called ", count, " times")
             #once acquired changes run, it is time to die and reproduce
             countGen += 1
             countChange = 0
-            print('Generation ' , countGen -1, ':')
+            print('Generation ' , countGen , ': \n')
             #sort the list of bots (reverse if black is objective, default if white is objective) To get the best of the generation.
-            bots.sort(key=lambda t: t.colour_code[0], reverse = False)
+            bots.sort(key=lambda t: t.colour_code[0], reverse = True)
             #print the best values for this generation
             best_ever = bots[0].colour_code
             best_ever_dna = bots[0].dna
             print(best_ever, best_ever_dna)
             #grab the top 25% of population and reproduce them 4 times. Kill the rest.
-            
+            generationBest = []
             numReplic = int(numBots *0.25)
-            thisGenReproduce = []
+            print("This is how many bots after the call: ",numReplic)
             for i in range(numReplic):
-                generationBest.append(bots[i])
-                thisGenReproduce.append(bots[i])
+                generationBest.append(bots[i])	
             #new generation
+            print("Length of bots before deletion: ", len(bots)) 
             del bots[:]
-            for i in range(len(thisGenReproduce)):
+            print("Length of bots after deletion: ", len(bots)) 
+            print("length of generationBest ", len(generationBest)) 
+            for i in range(len(generationBest)):
                 for j in range(4):
-                    thisGenReproduce[j].reproduce()
-        for bot in generationBest:
-            bot.draw_bot(count, ycount)
-            #bot.draw_best_dna(count, ycount)
-            if(count == 25):
-                count = 1
-                ycount += 1
-            else:
-                count += 1
-            
+                    generationBest[j].reproduce()
+					
         #if random.random()<0.02:
             #bots.append(create_bot(random.uniform(0,game_width),random.uniform(0,game_height)))
         #increase the iteration counter and reset the frame.
