@@ -29,7 +29,7 @@ def main():
     clock = pygame.time.Clock()
     #Change the colour of the bot over acquired change.
     def acquiredChange(colour_code):
-        # minus means moving towards black plus means moving towards white.
+        
         percent_change = (random.random() * colour_change_rate)
         print("We are changing the colour by: ", percent_change)
         #Move towards clearer colour

@@ -1,0 +1,95 @@
+<html>
+<canvas id = "gameCanvas" width = "1920" height = "600"></canvas>
+Hello World
+<script>
+
+var canvas;
+var canvasContext;
+var mutationRate = 0.2;
+var colorChangeRate = 0.0000000000003;
+var numGenerations = 10;
+var numBots = 100;
+var gray = new Array(127,127,127);
+var bots = new Array(numBots);
+
+window.onload = function() {
+    canvas = document.getElementById("gameCanvas");
+    canvasContext = canvas.getContext("2d");
+    //Instantiate the bots
+    for (i = 0; i < bots.length; i++) {
+        let bot = new Bot();
+        bots[i] = bot;
+    }
+
+    setInterval(drawEverything, 1000/60)
+    setInterval(cycle, 1000/60);
+    console.log("Hey I made it!");
+}
+
+function drawEverything() {
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0,0,canvas.width, canvas.height);
+    //Draw bots
+    for(i = 0; i < bots.length; i++){
+        color = bots[i].getColor();
+        drawCircle((i*20)+15,20,color);
+    }
+}
+
+function cycle() {
+    for(i = 0; i < bots.length; i++){
+        bots[i].update();
+    }
+}
+
+function drawCircle(x,y, color) {
+    canvasContext.fillStyle = 'rgb('+color[0]+' , ' + color[1] +' , '+ color[2] +')';
+    canvasContext.beginPath();
+    canvasContext.arc(x,y,10,0,2*Math.PI);
+    canvasContext.fill();
+    canvasContext.beginPath();
+    canvasContext.arc(x,y,10,0,2*Math.PI);
+    canvasContext.stroke();
+}
+
+function acquiredChange(color) {
+    var percent_change = (Math.random() * colorChangeRate);
+    console.log(percent_change);
+    if(percent_change > 1){
+        acqChngColor = [Math.min(Math.max(((percent_change*255) + color[0]) +color[0],0),255), Math.min(Math.max(((percent_change*255) + color[0]) +color[1],0),255), Math.min(Math.max(((percent_change*255) + color[0]) +color[2],0),255)];
+    }
+    else if(percent_change<1){
+        acqChngColor = [Math.max(Math.min(((percent_change*255) + color[0]) +color[0],255),0), Math.max(Math.min(((percent_change*255) + color[0]) +color[1],255),0), Math.max(Math.min(((percent_change*255) + color[0]) +color[2],255),0)];
+    }else{
+        acqChngColor = color;
+    }
+    console.log(acqChngColor)
+    return(acqChngColor)
+}
+
+class Bot {
+    
+    constructor(dnaColor = false) {
+        this.color = gray;
+    }
+
+    update() {
+        
+    }
+
+    reproduce() {
+
+    }
+
+    getColor() {
+        return this.color;
+    }
+}
+
+
+
+</script>
+
+
+
+</html>
