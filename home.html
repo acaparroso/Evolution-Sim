@@ -4,7 +4,7 @@
 <div>End: <input type="color" id = "end" value = "#F79459" size="7"></div>
 <div>Simulate: <input id = "ClickMe" type="button" value="clickme" onclick="simulate();"></div>
 <canvas id = "gameCanvas" width = "1920" height = "600"></canvas>
-Hello World
+<div id="Message">Waiting for start.</div>
 <script>
 
 var canvas;
@@ -13,21 +13,28 @@ var mutationRate = 0.2;
 var colorChangeRate = 0.003;
 var colorMutationRate = 0.045;
 var numGenerations = 10;
+var numChanges = 300;
 var numBots = 100;
 var gray = new Array(127,127,127);
 var bots = new Array(numBots);
+var genBest = new Array(0);
 var botRadius = 5;
 var startColor, endColor;
 var DE, CY;
+var width, height;
+var gen, chng;
 
 
 window.onload = function() {
   canvas = document.getElementById("gameCanvas");
   canvasContext = canvas.getContext("2d");
-
+  width = canvas.getAttribute("width");
+  height = canvas.getAttribute("height");
 }
 
 function simulate() {
+  document.getElementById("Message").innerHTML = "Simulating...";
+  
   if(!DE){
     clearInterval(DE);
     clearInterval(CY);
@@ -35,16 +42,96 @@ function simulate() {
   }
   startColor = h2r(document.getElementById("start").value);
   endColor = h2r(document.getElementById("end").value);
+  gen = 0; chng = 0;
   //Instantiate the bots
   for (i = 0; i < bots.length; i++) {
       let bot = new Bot();
       bots[i] = bot;
   }
   //These two take care of the drawing and the simulation logics on separate timers for them to be independent of one another.
-  SE =  setInterval(drawEverything, 1000/60);
+  DE =  setInterval(drawEverything, 1000/60);
   CY = setInterval(cycle, 1000/60);
 }
 
+//Use this function to run the simulation logics. (What needs to happen in the background so the logics are not tied to framerate)
+function cycle() {
+  //When the changes have reached the maximum, we need to stop the simulation for a bit.
+  if (chng == numChanges -1) {
+    document.getElementById("Message").innerHTML = "Generation " + gen+ " has finished its life, time for the fittest to have offspring!";
+    clearInterval(CY);
+    gen = gen + 1;
+    chng = 0;
+    //Sort the array of bots based on their fitness. 
+    bots.sort(compare);
+    var numReplic = Math.ceil(numBots * 0.25);
+    var GenReproduce = new Array(numReplic);
+    //Transfer the top 25 % to another array for reproduction. Stop drawing everything.
+    clearInterval(DE);
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0,0,canvas.width, canvas.height);
+    //We also animate the best of that generation.
+    for (i = 0; i < numReplic; i++) {
+      GenReproduce[i] = bots[i];
+      color = bots[i].getColor();
+      drawCircle((i*20)+15,20,botRadius,color);
+    }
+    for (i = numReplic; i < bots.length ; i++) {
+      drawCircle((i*20)+15,20,botRadius,[127,127,127]);
+    }
+    console.log(GenReproduce);
+    //wait for 4 seconds to show the best from that generation before reproduction
+    setTimeout( function() {
+      console.log("Starting next sim");
+      document.getElementById("Message").innerHTML = "Starting Generation " + gen + " 's simulation.";
+      //Reproducing
+      for (i = 0; i < numReplic; i++) {
+        for (j = 0; j < 4; j++) {
+          color = bots[i].getColor();
+          GenReproduce[i].reproduce();
+        }
+      }
+      //print new generation.
+      for (i = 0; i < bots.length; i++) {
+        drawCircle((i*20)+15,60,botRadius,color);
+      }
+      setTimeout(function(){
+        //wait 2 seconds and then restart the simulation
+        DE =  setInterval(drawEverything, 1000/60);
+        CY = setInterval(cycle, 1000/60);
+      }, 2000);
+    }, 4000);
+    
+
+
+    
+  } else {
+    chng = chng + 1;
+    acqChng();
+  }
+  
+}
+
+//Used to sort the bots array.
+function compare(a,b) {
+  const fitA = a.fitness;
+  const fitB = b.fitness;
+
+  let comparison = 0;
+
+  if (fitA > fitB) {
+    comparison = 1;
+  } else if (fitA < fitB) {
+    comparison = -1;
+  }
+
+  return comparison*-1;
+}
+
+function acqChng() {
+  for(i = 0; i < bots.length; i++){
+    bots[i].update();
+  }
+}
 //Used to parse a #ffffff hex string into an [r,g,b] array
 var h2r = function(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -139,21 +226,13 @@ var _interpolateHSL = function(color1, color2, factor) {
 function drawEverything() {
     canvasContext.fillStyle = 'white';
     canvasContext.fillRect(0,0,canvas.width, canvas.height);
-    //Draw bots
+    //Draw bots on bot array 
     for(i = 0; i < bots.length; i++){
         color = bots[i].getColor();
         drawCircle((i*20)+15,20,botRadius,color);
     }
 }
 
-//Use this function to run the simulation logics. (What needs to happen in the background so the logics are not tied to framerate)
-function cycle() {
-    
-  
-  for(i = 0; i < bots.length; i++){
-        bots[i].update();
-    }
-}
 
 //Circle with position x, y, radius r and whichever color. It has a black outline around it.
 function drawCircle(x,y,r, color) {
@@ -170,19 +249,22 @@ function drawCircle(x,y,r, color) {
 //This is just a class to keep track of the bots in case we add more functionalities to their behavior and changes later on.
 class Bot {
     
-    constructor(fitDNA = false) {
+    constructor(x = 200,y = 200,fitDNA = false) {
 
-      if (fit != false) {
+      if (fitDNA != false) {
         //There is an ancestor creating this bot, take their fitness into account
-        this.fitness = fit;
+        this.x = x;
+        this.y = y;
+
+        this.fitness = fitDNA;
         if (Math.random() < mutationRate) {
           //This bot has mutated on birth!
-          mutationAmount = colorMutationRate * Math.random();
-          this.fitness = fit + mutationAmount();
+          var mutationAmount = colorMutationRate * Math.random();
+          this.fitness = Math.min(fitDNA + mutationAmount, 1);
         }
       } else {
         //This bot was created without ancestors, we are GOD
-        this.fitDNA = 0.2;
+        this.fitDNA = 1.0;
         this.fitness = this.fitDNA;
       } 
       
@@ -197,7 +279,8 @@ class Bot {
     }
 
     reproduce() {
-
+      let bot = new Bot(this.x, this.y, this.fitDNA);
+      bots.push(bot);
     }
 
     getColor() {

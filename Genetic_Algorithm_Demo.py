@@ -146,7 +146,7 @@ def main():
                 GenNum = userGenNum
             else:
                 print('Input invalid using default')
-                GenNum = 30;
+                GenNum = 30
             if 0<userMutRate<1:
                 MutRate = userMutRate
             else:
@@ -289,9 +289,9 @@ def main():
                 for i in range(len(thisGenReproduce)):
                     for j in range(4):
                         if(Darwin):
-                            thisGenReproduce[j].reproduce()
+                            thisGenReproduce[i].reproduce()
                         else:
-                            thisGenReproduce[j].reproduce_nonDarwin()
+                            thisGenReproduce[i].reproduce_nonDarwin()
 
             # if random.random()<0.02:
                 # bots.append(create_bot(random.uniform(0,game_width),random.uniform(0,game_height)))
