@@ -51,68 +51,68 @@ function simulate() {
   }
   aaaaa = bots[1];
   //These two take care of the drawing and the simulation logics on separate timers for them to be independent of one another.
-  DE =  setInterval(drawEverything, 1000/30);
-  CY = setInterval(cycle, 1000/30);
+  DE =  setInterval(drawEverything, 1000/60);
+  CY = setInterval(cycle, 1000/60);
 }
 
 //Use this function to run the simulation logics. (What needs to happen in the background so the logics are not tied to framerate)
 function cycle() {
   //When the changes have reached the maximum, we need to stop the simulation for a bit.
   
-  // if (chng == numChanges -1) {
-  //   console.log("bots length: " + bots.length);
-  //   document.getElementById("Message").innerHTML = "Generation " + gen+ " has finished its life, time for the fittest to have offspring!";
-  //   clearInterval(CY);
-  //   gen = gen + 1;
-  //   chng = 0;
-  //   //Sort the array of bots based on their fitness. 
-  //   bots.sort(compare);
-  //   console.log("bots length: " + bots.length);
-  //   var numReplic = Math.ceil(numBots * 0.25);
-  //   var GenReproduce = new Array(numReplic);
-  //   //Transfer the top 25 % to another array for reproduction. Stop drawing everything.
-  //   clearInterval(DE);
-  //   canvasContext.fillStyle = 'white';
-  //   canvasContext.fillRect(0,0,canvas.width, canvas.height);
-  //   //We also animate the best of that generation.
-  //   for (i = 0; i < numReplic; i++) {
-  //     GenReproduce[i] = bots[i];
-  //     var color = bots[i].getColor();
-  //     drawCircle((i*20)+15,20,botRadius,color);
-  //   }
+  if (chng == numChanges -1) {
+    console.log("bots length: " + bots.length);
+    document.getElementById("Message").innerHTML = "Generation " + gen+ " has finished its life, time for the fittest to have offspring!";
+    clearInterval(CY);
+    gen = gen + 1;
+    chng = 0;
+    //Sort the array of bots based on their fitness. 
+    bots.sort(compare);
+    console.log("bots length: " + bots.length);
+    var numReplic = Math.ceil(numBots * 0.25);
+    var GenReproduce = new Array(numReplic);
+    //Transfer the top 25 % to another array for reproduction. Stop drawing everything.
+    clearInterval(DE);
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0,0,canvas.width, canvas.height);
+    //We also animate the best of that generation.
+    for (i = 0; i < numReplic; i++) {
+      GenReproduce[i] = bots[i];
+      var color = bots[i].getColor();
+      drawCircle((i*20)+15,20,botRadius,color);
+    }
 
-  //   console.log(GenReproduce);
-  //   //wait for 4 seconds to show the best from that generation before reproduction
-  //   setTimeout( function() {
-  //     console.log("Starting next sim");
-  //     document.getElementById("Message").innerHTML = "Starting Generation " + gen + " 's simulation.";
-  //     //Reproducing
-  //     for (i = 0; i < numReplic; i++) {
-  //       for (j = 0; j < 4; j++) {
-  //         GenReproduce[i].reproduce();
-  //       }
-  //     }
-  //     //print new generation.
-  //     for (i = 0; i < bots.length; i++) {
-  //       drawCircle((i*20)+15,60,botRadius,bots[i].getColor());
-  //     }
-  //     setTimeout(function(){
-  //       //wait 2 seconds and then restart the simulation
-  //       DE =  setInterval(drawEverything, 1000/60);
-  //       CY = setInterval(cycle, 1000/60);
-  //     }, 2000);
-  //   }, 4000);
+    console.log(GenReproduce);
+    //wait for 2 seconds to show the best from that generation before reproduction
+    setTimeout( function() {
+      console.log("Starting next sim");
+      document.getElementById("Message").innerHTML = "Starting Generation " + gen + " 's simulation.";
+      //Reproducing
+      for (i = 0; i < numReplic; i++) {
+        for (j = 0; j < 4; j++) {
+          GenReproduce[i].reproduce();
+        }
+      }
+      //print new generation.
+      for (i = 0; i < bots.length; i++) {
+        drawCircle((i*20)+15,60,botRadius,bots[i].getColor());
+      }
+      setTimeout(function(){
+        //wait 2 seconds and then restart the simulation
+        DE =  setInterval(drawEverything, 1000/60);
+        CY = setInterval(cycle, 1000/60);
+      }, 2000);
+    }, 2000);
     
 
 
     
-  // } else {
+  } else {
     chng = chng + 1;
     console.log("Before: "+ bots[0].getCultureFitness())
     acqChng();
     console.log("After: "+ bots[0].getCultureFitness())
 
-  // }
+  }
   
 }
 
@@ -148,9 +148,16 @@ class Bot {
     constructor(x = 200,y = 200,DNAcolor = false, bioInterpDNA = 0, ancestColor = false) {
       this.x = x; this.y = y; this.DNAcolor = DNAcolor; this.bioLerp = bioInterpDNA; this.ancestorColor = ancestColor; this.cultureLerp = 0;
       if (DNAcolor == false) {
+        //This is used in case the bot is created without an ancestor.
         this.color = getRandomColor();
         this.DNAcolor = this.color;
-      } 
+      } else {
+        //This is used in case an ancestor is creating this bot.
+        //Mutation needs to be taken care of
+        //We are using the random color system, so we will use the current color related to the target color as the lerp variables.
+        
+
+      }
     }
 
     update() {
