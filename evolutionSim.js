@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-multi-assign */
@@ -42,7 +43,12 @@ function simulate() {
   if(DE) {
     clearInterval(DE);
     clearInterval(CY);
+<<<<<<< HEAD
     console.log("clearing");
+=======
+    console.log('clearing');
+    bots.length = 0;
+>>>>>>> b867ada20d57d6c9e33a5f96eef9d2f962f86668
   }
   bioIdeal = h2r(document.getElementById("Biological").value);
   cultureIdeal = h2r(document.getElementById("Cultural").value);
@@ -58,7 +64,12 @@ function simulate() {
   CY = setInterval(cycle, 1000/60);
 }
 
+<<<<<<< HEAD
 //Use this function to run the simulation logics. (What needs to happen in the background so the logics are not tied to framerate)
+=======
+// Use this function to run the simulation logics. They will be independent of drawing.
+// (What needs to happen in the background so the logics are not tied to framerate)
+>>>>>>> b867ada20d57d6c9e33a5f96eef9d2f962f86668
 function cycle() {
   //When the changes have reached the maximum, we need to stop the simulation for a bit.
   
@@ -84,6 +95,7 @@ function cycle() {
       drawCircle((i*20)+15,20,botRadius,color);
     }
 
+<<<<<<< HEAD
     console.log(GenReproduce);
     //wait for 2 seconds to show the best from that generation before reproduction
     setTimeout( function() {
@@ -96,6 +108,17 @@ function cycle() {
         for (j = 0; j < 4; j++) {
           newGen[k] = GenReproduce[i].reproduce();
           k++;
+=======
+
+    // wait for 2 seconds to show the best from that generation before reproduction
+    setTimeout(() => {
+      document.getElementById("Message").innerHTML = `Starting Generation ${gen} 's simulation.`;
+      console.log(bots.length);
+      // Reproducing
+      for (let i = 0; i < numReplic; i += 1) {
+        for (let j = 0; j < 4; j += 1) {
+          GenReproduce[i].reproduce();
+>>>>>>> b867ada20d57d6c9e33a5f96eef9d2f962f86668
         }
       }
       //print new generation.
@@ -130,6 +153,7 @@ function cycle() {
 
 //Use this function to run the refresh rate and the graphic logic. (What gets printed every x seconds)
 function drawEverything() {
+<<<<<<< HEAD
     canvasContext.fillStyle = 'white';
     canvasContext.fillRect(0,0,canvas.width, canvas.height);
     //Draw bots on bot array 
@@ -137,6 +161,15 @@ function drawEverything() {
         var color = bots[i].getColor();
         drawCircle((i*20)+15,20,botRadius,color);
     }
+=======
+  canvasContext.fillStyle = 'white';
+  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+  // Draw bots on bot array
+  for (let i = 0; i < bots.length; i += 1) {
+    var color = bots[i].getColor();
+    drawCircle((i * 20) + 15, 20, botRadius, color);
+  }
+>>>>>>> b867ada20d57d6c9e33a5f96eef9d2f962f86668
 }
 
 
@@ -154,6 +187,22 @@ function drawCircle(x,y,r, color) {
 
 //This is just a class to keep track of the bots in case we add more functionalities to their behavior and changes later on.
 class Bot {
+<<<<<<< HEAD
+=======
+  constructor(x = 200, y = 200, DNAcolor = false, bioInterpDNA = 0, ancestColor = false) {
+    this.x = x; this.y = y; this.DNAcolor = DNAcolor;
+    this.bioLerp = bioInterpDNA; this.ancestorColor = ancestColor; this.cultureLerp = 0;
+    this.color = [0, 0, 0];
+    if (DNAcolor === false) {
+      // This is used in case the bot is created without an ancestor.
+      this.color = getRandomColor();
+      this.DNAcolor = this.color;
+    } else {
+      // This is used in case an ancestor is creating this bot.
+      // Mutation needs to be taken care of
+      // We are using the random color system, so we will
+      // use the current color related to the target color as the lerp variables.
+>>>>>>> b867ada20d57d6c9e33a5f96eef9d2f962f86668
 
     constructor(x = 200,y = 200,DNAcolor = false, bioInterpDNA = 0, ancestColor = false) {
       this.x = x; this.y = y; this.DNAcolor = DNAcolor; this.bioLerp = bioInterpDNA; this.ancestorColor = ancestColor; this.cultureLerp = 0;
