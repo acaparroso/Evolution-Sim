@@ -87,15 +87,22 @@ function cycle() {
       console.log("Starting next sim");
       document.getElementById("Message").innerHTML = "Starting Generation " + gen + " 's simulation.";
       //Reproducing
+      var newGen = new Array(numBots);
+      var k = 0;
       for (i = 0; i < numReplic; i++) {
         for (j = 0; j < 4; j++) {
-          GenReproduce[i].reproduce();
+          newGen[k] = GenReproduce[i].reproduce();
+          k++;
         }
       }
       //print new generation.
+      bots.length = 0;
+      console.log(newGen);
+      bots = newGen;
       for (i = 0; i < bots.length; i++) {
         drawCircle((i*20)+15,60,botRadius,bots[i].getColor());
       }
+      
       setTimeout(function(){
         //wait 2 seconds and then restart the simulation
         DE =  setInterval(drawEverything, 1000/60);
@@ -179,7 +186,7 @@ class Bot {
 
     reproduce() {
       let bot = new Bot(this.x, this.y, this.DNAcolor, this.bioInterpFitness, this.ancestColor);
-      bots.push(bot);
+      return bot;
     }
 
     getColor() {
