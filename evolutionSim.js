@@ -116,7 +116,8 @@ function drawEverything() {
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
   // Draw bots on bot array
   for (let i = 0; i < bots.length; i += 1) {
-    const color = bots[i].getColor();
+    var color = bots[i].getColor();
+    console.log(color);
     drawCircle((i * 20) + 15, 20, botRadius, color);
   }
 }
@@ -187,7 +188,8 @@ function calculateBioFitness(c1, c2) {
   return Math.abs(eDistance(c1, c2));
 }
 
-// Take the target color and it's relative positioning to the current colour to determine a fitness value
+// Take the target color and it's relative positioning to the current
+// colour to determine a fitness value
 function calculateCulturalFitness(c1, c2) {
   return Math.abs(eDistance(c1, c2));
 }
@@ -244,7 +246,7 @@ var h2r = function (hex) {
 
 // Parse an [rgb] array to a #ffffff string
 var r2h = function (rgb) {
-  return `#${((1 < 24) + (rgb[0] < 16) + (rgb[1] < 8) + rgb[2]).toString(16).slice(1)}`;
+  return `#${((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1)}`;
 };
 
 // Interpolates two [r,g,b] colors and returns an [r,g,b] of the result
