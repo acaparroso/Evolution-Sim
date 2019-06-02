@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-multi-assign */
@@ -41,6 +42,7 @@ function simulate() {
     clearInterval(DE);
     clearInterval(CY);
     console.log('clearing');
+    bots.length = 0;
   }
   bioIdeal = h2r(document.getElementById("Biological").value);
   cultureIdeal = h2r(document.getElementById("Cultural").value);
@@ -56,7 +58,7 @@ function simulate() {
   CY = setInterval(cycle, 1000 / 60);
 }
 
-// Use this function to run the simulation logics.
+// Use this function to run the simulation logics. They will be independent of drawing.
 // (What needs to happen in the background so the logics are not tied to framerate)
 function cycle() {
   // When the changes have reached the maximum, we need to stop the simulation for a bit.
@@ -86,6 +88,7 @@ function cycle() {
     // wait for 2 seconds to show the best from that generation before reproduction
     setTimeout(() => {
       document.getElementById("Message").innerHTML = `Starting Generation ${gen} 's simulation.`;
+      console.log(bots.length);
       // Reproducing
       for (let i = 0; i < numReplic; i += 1) {
         for (let j = 0; j < 4; j += 1) {
@@ -117,7 +120,6 @@ function drawEverything() {
   // Draw bots on bot array
   for (let i = 0; i < bots.length; i += 1) {
     var color = bots[i].getColor();
-    console.log(color);
     drawCircle((i * 20) + 15, 20, botRadius, color);
   }
 }
@@ -141,6 +143,7 @@ class Bot {
   constructor(x = 200, y = 200, DNAcolor = false, bioInterpDNA = 0, ancestColor = false) {
     this.x = x; this.y = y; this.DNAcolor = DNAcolor;
     this.bioLerp = bioInterpDNA; this.ancestorColor = ancestColor; this.cultureLerp = 0;
+    this.color = [0, 0, 0];
     if (DNAcolor === false) {
       // This is used in case the bot is created without an ancestor.
       this.color = getRandomColor();
