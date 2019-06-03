@@ -1,0 +1,48 @@
+.highlightButton {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.lowlightedButton{
+  background-color: rgb(88, 88, 88); /* Grey */
+  border: none;
+  color: rgb(0, 0, 0);
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+
+.button:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 20px 0 rgba(0,0,0,0.19);
+}
+.highlightButton:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 20px 0 rgba(0,0,0,0.19);
+}
+
+.button{
+    background-color: rgb(214, 87, 87); /* black */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+#buttons{
+    margin-top: 10px;
+    margin-bottom: 40px;
+}

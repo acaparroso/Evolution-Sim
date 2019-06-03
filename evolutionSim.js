@@ -1,3 +1,6 @@
+/* eslint-disable no-shadow */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable camelcase */
 /* eslint-disable no-bitwise */
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
@@ -14,9 +17,9 @@ const colorChangeRate = 0.003;
 const colorMutationRate = 0.045;
 const numGenerations = 10;
 const numChanges = 300;
-const numBots = 100;
+const numBots = 4;
 const gray = [127, 127, 127];
-const bots = new Array(numBots);
+let bots = new Array(numBots);
 const genBest = new Array(0);
 const botRadius = 5;
 let bioIdeal;
@@ -37,9 +40,10 @@ window.onload = function () {
   height = canvas.getAttribute("height");
 };
 
+// eslint-disable-next-line no-unused-vars
 function simulate() {
   document.getElementById("Message").innerHTML = "Simulating...";
-
+  document.getElementById("runSim").classList = "button";
   if (DE) {
     clearInterval(DE);
     clearInterval(CY);
@@ -50,12 +54,12 @@ function simulate() {
   cultureIdeal = h2r(document.getElementById("Cultural").value);
   gen = 0; chng = 0;
   // Instantiate the bots
-  for (i = 0; i < bots.length; i++) {
+  for (let i = 0; i < numBots; i += 1) {
     const bot = new Bot();
     bots[i] = bot;
   }
-  aaaaa = bots[1];
-  // These two take care of the drawing and the simulation logics on separate timers for them to be independent of one another.
+  // These two take care of the drawing and the
+  // simulation logics on separate timers for them to be independent of one another.
   DE = setInterval(drawEverything, 1000 / 60);
   CY = setInterval(cycle, 1000 / 60);
 }
@@ -65,7 +69,7 @@ function simulate() {
 function cycle() {
   // When the changes have reached the maximum, we need to stop the simulation for a bit.
 
-  if (chng == numChanges - 1) {
+  if (chng === numChanges - 1) {
     console.log(`bots length: ${bots.length}`);
     document.getElementById("Message").innerHTML = `Generation ${gen} has finished its life, time for the fittest to have offspring!`;
     clearInterval(CY);
@@ -81,28 +85,31 @@ function cycle() {
     canvasContext.fillStyle = 'white';
     canvasContext.fillRect(0, 0, canvas.width, canvas.height);
     // We also animate the best of that generation.
-    for (i = 0; i < numReplic; i++) {
+    for (let i = 0; i < numReplic; i += 1) {
       GenReproduce[i] = bots[i];
       var color = bots[i].getColor();
       drawCircle((i * 20) + 15, 20, botRadius, color);
     }
 
-
+    console.log(GenReproduce);
     // wait for 2 seconds to show the best from that generation before reproduction
     setTimeout(() => {
+      console.log("Starting next sim");
       document.getElementById("Message").innerHTML = `Starting Generation ${gen} 's simulation.`;
-      console.log(bots.length);
       // Reproducing
+      var newGen = new Array(numBots);
+      var k = 0;
       for (let i = 0; i < numReplic; i += 1) {
         for (let j = 0; j < 4; j += 1) {
-          GenReproduce[i].reproduce();
+          newGen[k] = GenReproduce[i].reproduce();
+          k += 1;
         }
       }
       // print new generation.
       bots.length = 0;
       console.log(newGen);
       bots = newGen;
-      for (i = 0; i < bots.length; i++) {
+      for (let i = 0; i < bots.length; i += 1) {
         drawCircle((i * 20) + 15, 60, botRadius, bots[i].getColor());
       }
 
@@ -114,14 +121,27 @@ function cycle() {
     }, 2000);
   } else {
     chng += 1;
-    console.log(`Before: ${bots[0].getCultureFitness()}`);
     acqChng();
-    console.log(`After: ${bots[0].getCultureFitness()}`);
   }
 }
 
+// eslint-disable-next-line no-unused-vars
+function pauseSim() {
+  clearInterval(CY);
+  document.getElementById("nextGen").classList = "highlightButton";
+  document.getElementById("Message").innerHTML = "Paused";
+}
 
-// Use this function to run the refresh rate and the graphic logic. (What gets printed every x seconds)
+// eslint-disable-next-line no-unused-vars
+function resumeSim() {
+  CY = setInterval(cycle, 1000 / 60);
+  document.getElementById("nextGen").classList = "lowlightedButton";
+  document.getElementById("Message").innerHTML = "Simulating...";
+}
+
+
+// Use this function to run the refresh rate and
+// the graphic logic. (What gets printed every x seconds)
 function drawEverything() {
   canvasContext.fillStyle = 'white';
   canvasContext.fillRect(0, 0, canvas.width, canvas.height);
@@ -135,7 +155,7 @@ function drawEverything() {
 
 // Circle with position x, y, radius r and whichever color. It has a black outline around it.
 function drawCircle(x, y, r, color) {
-  canvasContext.fillStyle = r2h(color);
+  canvasContext.fillStyle = `rgb(${color[0]},${color[1]},${color[2]}`;
   canvasContext.beginPath();
   canvasContext.arc(x, y, r * 2, 0, 2 * Math.PI);
   canvasContext.fill();
@@ -145,28 +165,46 @@ function drawCircle(x, y, r, color) {
 }
 
 
-// This is just a class to keep track of the bots in case we add more functionalities to their behavior and changes later on.
+// This is just a class to keep track of the bots in case we
+// add more functionalities to their behavior and changes later on.
 class Bot {
-  constructor(x = 200, y = 200, DNAcolor = false, bioInterpDNA = 0, ancestColor = false) {
-    this.x = x; this.y = y; this.DNAcolor = DNAcolor; this.bioLerp = bioInterpDNA; this.ancestorColor = ancestColor; this.cultureLerp = 0;
-    if (DNAcolor == false) {
+  // This is used in case an ancestor is creating this bot.
+  // Mutation needs to be taken care of
+  // We are using the random color system, so we will
+  // use the current color related to the target color as the lerp variables.
+
+  constructor(x = 200, y = 200, DNAcolor = false, color = getRandomColor()) {
+    this.x = x; this.y = y; this.DNAcolor = DNAcolor;
+    if (DNAcolor === false) {
       // This is used in case the bot is created without an ancestor.
-      this.color = getRandomColor();
+      this.color = color;
       this.DNAcolor = this.color;
-    } else {
+      // Is it going to mutate?
+    } else if (Math.random() <= mutationRate) {
       // This is used in case an ancestor is creating this bot.
       // Mutation needs to be taken care of
-      // We are using the random color system, so we will use the current color related to the target color as the lerp variables.
-
-
+      // We are using the random color system,
+      // so we will use the current color related to the target color as the lerp variables.
+      var amountChange = Math.random() * colorMutationRate;
+      // lerp with the current color as well, distance is lowered every time as well.
+      this.bioLerp = Math.min(amountChange, 1);
+      if (Darwin) {
+        // Interpolate between the DNA of the ancestor and bioIdeal
+        this.color = interpolateRGB(this.DNAcolor, bioIdeal, this.bioLerp);
+        this.DNAcolor = this.color;
+      } else {
+        // Interpolate between the color at death of the ancestor and bioIdeal
+        this.color = interpolateRGB(this.color, bioIdeal, this.bioLerp);
+        this.DNAcolor = this.color;
+      }
     }
   }
 
   update() {
-    var percent_change = (Math.random() * colorChangeRate);
+    var percentChange = (Math.random() * colorChangeRate);
     // This lerp is done with the current color which means the distance is lowered every time.
-    this.cultureLerp = Math.min(this.cultureLerp + percent_change, 1);
-    this.color = _interpolateHSL(this.DNAcolor, cultureIdeal, this.cultureLerp);
+    this.cultureLerp = Math.min(percentChange, 1);
+    this.color = interpolateRGB(this.color, cultureIdeal, this.cultureLerp);
   }
 
   getFitness() {
@@ -180,7 +218,7 @@ class Bot {
   }
 
   reproduce() {
-    const bot = new Bot(this.x, this.y, this.DNAcolor, this.bioInterpFitness, this.ancestColor);
+    const bot = new Bot(this.x, this.y, this.DNAcolor, this.color);
     return bot;
   }
 
@@ -189,12 +227,14 @@ class Bot {
   }
 }
 
-// Take the target color and it's relative positioning to the current colour to determine a fitness value
+// Take the target color and it's relative positioning
+// to the current colour to determine a fitness value
 function calculateBioFitness(c1, c2) {
   return Math.abs(eDistance(c1, c2));
 }
 
-// Take the target color and it's relative positioning to the current colour to determine a fitness value
+// Take the target color and it's relative positioning
+// to the current colour to determine a fitness value
 function calculateCulturalFitness(c1, c2) {
   return Math.abs(eDistance(c1, c2));
 }
@@ -203,7 +243,7 @@ function calculateCulturalFitness(c1, c2) {
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
   var color = '#';
-  for (var i = 0; i < 6; i++) {
+  for (let i = 0; i < 6; i += 1) {
     color += letters[Math.floor(Math.random() * 16)];
   }
   return h2r(color);
@@ -212,7 +252,7 @@ function getRandomColor() {
 // Function returns the Euclidean distance between two colors (Given their RGB values as an array).
 function eDistance(p1, p2) {
   var d = 0;
-  for (i = 0; i < p1.length; i++) {
+  for (let i = 0; i < p1.length; i += 1) {
     d += (p1[i] - p2[i]) * (p1[i] - p2[i]);
   }
   return Math.sqrt(d);
@@ -235,7 +275,8 @@ function compare(a, b) {
 }
 
 function acqChng() {
-  for (i = 0; i < bots.length; i++) {
+  for (let i = 0; i < bots.length; i += 1) {
+    if (i === 0) { console.log(bots[0].color); }
     bots[i].update();
   }
 }
@@ -249,24 +290,12 @@ var h2r = function (hex) {
   ] : null;
 };
 
-// Parse an [rgb] array to a #ffffff string
-var r2h = function (rgb) {
-  return `#${((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1)}`;
-};
-
 // Interpolates two [r,g,b] colors and returns an [r,g,b] of the result
 // Taken from the awesome ROT.js roguelike dev library at
 // https://github.com/ondras/rot.js
 // The functions related to the color are taken from https://codepen.io/njmcode/pen/axoyD/
 
-var _interpolateColor = function (color1, color2, factor) {
-  if (arguments.length < 3) { factor = 0.5; }
-  var result = color1.slice();
-  for (var i = 0; i < 3; i++) {
-    result[i] = result[i] + factor * (color2[i] - color1[i]);
-  }
-  return result;
-};
+// eslint-disable-next-line no-unused-vars
 // function to convert from rgb to hsl
 var rgb2hsl = function (color) {
   var r = color[0] / 255;
@@ -278,11 +307,12 @@ var rgb2hsl = function (color) {
   var h; var s; var
     l = (max + min) / 2;
 
-  if (max == min) {
+  if (max === min) {
     h = s = 0; // achromatic
   } else {
     var d = max - min;
     s = (l > 0.5 ? d / (2 - max - min) : d / (max + min));
+    // eslint-disable-next-line default-case
     switch (max) {
       case r: h = (g - b) / d + (g < b ? 6 : 0); break;
       case g: h = (b - r) / d + 2; break;
@@ -298,7 +328,7 @@ var rgb2hsl = function (color) {
 var hsl2rgb = function (color) {
   var l = color[2];
 
-  if (color[1] == 0) {
+  if (color[1] === 0) {
     l = Math.round(l * 255);
     return [l, l, l];
   }
@@ -320,12 +350,34 @@ var hsl2rgb = function (color) {
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 };
 
-var _interpolateHSL = function (color1, color2, factor) {
-  if (arguments.length < 3) { factor = 0.5; }
-  var hsl1 = rgb2hsl(color1);
-  var hsl2 = rgb2hsl(color2);
-  for (var i = 0; i < 3; i++) {
-    hsl1[i] += factor * (hsl2[i] - hsl1[i]);
+// eslint-disable-next-line no-unused-vars
+function interpolateRGB(rgb1, rgb2, t) {
+  var r_1 = rgb1[0];
+  var g_1 = rgb1[1];
+  var b_1 = rgb1[2];
+  var a_1 = rgb1[3];
+
+  var r_2 = rgb2[0];
+  var g_2 = rgb2[1];
+  var b_2 = rgb2[2];
+  var a_2 = rgb2[3];
+
+  var interpolate = function (t) {
+    var r_3 = r_1 + t * (r_2 - r_1);
+    var g_3 = g_1 + t * (g_2 - g_1);
+    var b_3 = b_1 + t * (b_2 - b_1);
+    var result = [r_3, g_3, b_3];
+
+    if (rgb1.length === 4 && rgb2.length === 4) {
+      var a_3 = a_1 + t * (a_2 - a_1);
+      result.push(a_3);
+    }
+
+    return result;
+  };
+
+  if (arguments.length === 2) {
+    return interpolate;
   }
-  return hsl2rgb(hsl1);
-};
+  return interpolate(t);
+}
