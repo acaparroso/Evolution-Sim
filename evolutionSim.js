@@ -14,10 +14,10 @@ let canvas;
 let canvasContext;
 const mutationRate = 0.2;
 const colorChangeRate = 0.003;
-const colorMutationRate = 0.045;
+const colorMutationRate = 0.15;
 const numGenerations = 10;
 const numChanges = 300;
-const numBots = 4;
+const numBots = 100;
 const gray = [127, 127, 127];
 let bots = new Array(numBots);
 const genBest = new Array(0);
@@ -197,6 +197,8 @@ class Bot {
         this.color = interpolateRGB(this.color, bioIdeal, this.bioLerp);
         this.DNAcolor = this.color;
       }
+    } else {
+      this.color = this.DNAcolor;
     }
   }
 
@@ -257,6 +259,10 @@ function eDistance(p1, p2) {
   }
   return Math.sqrt(d);
 }
+
+
+// ////////TODO:Fix This it is backwards!!!!!!!
+
 
 // Used to sort the bots array.
 function compare(a, b) {
