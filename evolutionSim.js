@@ -38,6 +38,10 @@ window.onload = function () {
   canvasContext = canvas.getContext("2d");
   width = canvas.getAttribute("width");
   height = canvas.getAttribute("height");
+  updateTextColor();
+  $(".colorChange").change(() => {
+    updateTextColor();
+  });
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -386,4 +390,12 @@ function interpolateRGB(rgb1, rgb2, t) {
     return interpolate;
   }
   return interpolate(t);
+}
+
+function updateTextColor() {
+  var bio = $("#Biological").css("color");
+  console.log(`We are changing the color of the text to: ${bio}`);
+  $(".bioColor").css("color", bio);
+  var cult = $("Cultural").css("color");
+  $(".cultColor").css("color", cult);
 }

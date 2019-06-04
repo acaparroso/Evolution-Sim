@@ -2,10 +2,53 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 </head>
-<div>Biological Ideal:<input type="color" id="Biological" value="#00FF00" size="7">
+<div>
+    <div>
+        <p>
+            The Darwinian model says that our DNA gets shared to offspring.<br>
+            The alternative model says that the culture gets transmitted with the "current" personality of the person to
+            offspring<br>
+            <input type="radio" name="model" value="darwin" checked>Darwinian model<br>
+            <input type="radio" name="model" value="alternative">Alternative model<br>
+        </p>
+    </div>
+    <div>
+        <p>
+            In this simulation, the sims selected for reproduction are the "fittest" 
+            according to either <span class ="cultColor">Cultural fitness</span> or <span class="bioColor">Biological fitness?</span> <br>
+            <input type="radio" name="toward" value="bio" checked><span class="bioColor">Biological Ideal</span> <br>
+            <input type="radio" name="toward" value="cult"><span class ="cultColor">Cultural Ideal</span><br>
+        </p>
+    </div>
+    <div>
+        <p>
+
+        </p>
+    </div>
+    <a href='#' class='advanced'>Advanced Options</a>
+
+    <div id='advancedOptions'>
+        <!-- Form stuff here -->
+        <div>Biological Ideal:<input type="color" id="Biological" class = "colorChange" value="#00FF00" size="7">
+        </div>
+        <div>Cultural Ideal: <input type="color" id="Cultural" class = "colorChange" value="#FF00FF" size="7"></div>
+    </div>
+
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $('#advancedOptions').hide();
+            $('.advanced').click(function () {
+                if ($('#advancedOptions').is(':hidden')) {
+                    $('#advancedOptions').slideDown();
+                } else {
+                    $('#advancedOptions').slideUp();
+                }
+            });
+        });
+    </script>
 </div>
-<div>Cultural Ideal: <input type="color" id="Cultural" value="#FF00FF" size="7"></div>
 <div id="buttons">
     <input id="runSim" class="highlightButton" type="button" value="Run Simulation >" onclick="simulate();">
     -------
