@@ -12,9 +12,9 @@
 /* eslint-disable linebreak-style */
 let canvas;
 let canvasContext;
-const mutationRate = 0.2;
-const colorChangeRate = 0.003;
-const colorMutationRate = 0.15;
+const mutationRate = 0.2; // How often they mutate?
+const colorChangeRate = 0.004; // How much they change every acquired change
+const colorMutationRate = 0.25;
 const numGenerations = 10;
 const numChanges = 300;
 const numBots = 100;
@@ -31,7 +31,7 @@ let height;
 let gen;
 let chng;
 const Darwin = true;
-
+const towardBio = true;
 
 window.onload = function () {
   canvas = document.getElementById("gameCanvas");
@@ -70,14 +70,14 @@ function cycle() {
   // When the changes have reached the maximum, we need to stop the simulation for a bit.
 
   if (chng === numChanges - 1) {
-    console.log(`bots length: ${bots.length}`);
+    // console.log(`bots length: ${bots.length}`);
     document.getElementById("Message").innerHTML = `Generation ${gen} has finished its life, time for the fittest to have offspring!`;
     clearInterval(CY);
     gen += 1;
     chng = 0;
     // Sort the array of bots based on their fitness.
     bots.sort(compare);
-    console.log(`bots length: ${bots.length}`);
+    // console.log(`bots length: ${bots.length}`);
     var numReplic = Math.ceil(numBots * 0.25);
     var GenReproduce = new Array(numReplic);
     // Transfer the top 25 % to another array for reproduction. Stop drawing everything.
@@ -107,7 +107,7 @@ function cycle() {
       }
       // print new generation.
       bots.length = 0;
-      console.log(newGen);
+      // console.log(newGen);
       bots = newGen;
       for (let i = 0; i < bots.length; i += 1) {
         drawCircle((i * 20) + 15, 60, botRadius, bots[i].getColor());
@@ -185,6 +185,7 @@ class Bot {
       // Mutation needs to be taken care of
       // We are using the random color system,
       // so we will use the current color related to the target color as the lerp variables.
+      console.log("Mutated!");
       var amountChange = Math.random() * colorMutationRate;
       // lerp with the current color as well, distance is lowered every time as well.
       this.bioLerp = Math.min(amountChange, 1);
@@ -194,6 +195,7 @@ class Bot {
         this.DNAcolor = this.color;
       } else {
         // Interpolate between the color at death of the ancestor and bioIdeal
+        this.color = color;
         this.color = interpolateRGB(this.color, bioIdeal, this.bioLerp);
         this.DNAcolor = this.color;
       }
@@ -261,9 +263,6 @@ function eDistance(p1, p2) {
 }
 
 
-// ////////TODO:Fix This it is backwards!!!!!!!
-
-
 // Used to sort the bots array.
 function compare(a, b) {
   const fitA = a.getFitness();
@@ -276,13 +275,14 @@ function compare(a, b) {
   } else if (fitA < fitB) {
     comparison = -1;
   }
-
-  return comparison * -1;
+  if (!towardBio) {
+    comparison *= -1;
+  }
+  return comparison;
 }
 
 function acqChng() {
   for (let i = 0; i < bots.length; i += 1) {
-    if (i === 0) { console.log(bots[0].color); }
     bots[i].update();
   }
 }
