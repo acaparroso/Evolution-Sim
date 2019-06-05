@@ -12,15 +12,12 @@
 /* eslint-disable linebreak-style */
 let canvas;
 let canvasContext;
-const mutationRate = 0.2; // How often they mutate?
-const colorChangeRate = 0.004; // How much they change every acquired change
-const colorMutationRate = 0.25;
-const numGenerations = 10;
-const numChanges = 300;
+let mutationRate = 0.2; // How often they mutate?
+let colorChangeRate = 0.004; // How much they change every acquired change
+let colorMutationRate = 0.1;
+let numChanges = 300;
 const numBots = 100;
-const gray = [127, 127, 127];
 let bots = new Array(numBots);
-const genBest = new Array(0);
 const botRadius = 5;
 let bioIdeal;
 let cultureIdeal;
@@ -30,32 +27,29 @@ let width;
 let height;
 let gen;
 let chng;
-const Darwin = true;
-const towardBio = true;
+let Darwin = true;
+let towardBio = true;
+let paused = false;
 
 window.onload = function () {
   canvas = document.getElementById("gameCanvas");
   canvasContext = canvas.getContext("2d");
   width = canvas.getAttribute("width");
   height = canvas.getAttribute("height");
-  updateTextColor();
-  $(".colorChange").change(() => {
-    updateTextColor();
-  });
 };
 
 // eslint-disable-next-line no-unused-vars
 function simulate() {
   document.getElementById("Message").innerHTML = "Simulating...";
   document.getElementById("runSim").classList = "button";
+  paused = false;
   if (DE) {
     clearInterval(DE);
     clearInterval(CY);
     console.log('clearing');
     bots.length = 0;
   }
-  bioIdeal = h2r(document.getElementById("Biological").value);
-  cultureIdeal = h2r(document.getElementById("Cultural").value);
+  fetchSimValues();
   gen = 0; chng = 0;
   // Instantiate the bots
   for (let i = 0; i < numBots; i += 1) {
@@ -99,7 +93,8 @@ function cycle() {
     // wait for 2 seconds to show the best from that generation before reproduction
     setTimeout(() => {
       console.log("Starting next sim");
-      document.getElementById("Message").innerHTML = `Starting Generation ${gen} 's simulation.`;
+      document.getElementById("Message").innerHTML = "And those are Their offspring below them! <br>Press next generation to continue...";
+      document.getElementById("nextGen").classList = "highlightButton";
       // Reproducing
       var newGen = new Array(numBots);
       var k = 0;
@@ -116,31 +111,25 @@ function cycle() {
       for (let i = 0; i < bots.length; i += 1) {
         drawCircle((i * 20) + 15, 60, botRadius, bots[i].getColor());
       }
+    }, 4000);
 
-      setTimeout(() => {
-        // wait 2 seconds and then restart the simulation
-        DE = setInterval(drawEverything, 1000 / 60);
-        CY = setInterval(cycle, 1000 / 60);
-      }, 2000);
-    }, 2000);
+    document.getElementById("Message").innerHTML = `Generation ${gen} Has finished its life! These are selected to reproduce in the next generation!`;
   } else {
+    document.getElementById("Message").innerHTML = "Simulating...";
     chng += 1;
     acqChng();
   }
 }
 
-// eslint-disable-next-line no-unused-vars
-function pauseSim() {
-  clearInterval(CY);
-  document.getElementById("nextGen").classList = "highlightButton";
-  document.getElementById("Message").innerHTML = "Paused";
-}
 
 // eslint-disable-next-line no-unused-vars
 function resumeSim() {
   CY = setInterval(cycle, 1000 / 60);
+  DE = setInterval(drawEverything, 1000 / 60);
   document.getElementById("nextGen").classList = "lowlightedButton";
-  document.getElementById("Message").innerHTML = "Simulating...";
+  document.getElementById("Message").innerHTML = `Starting Generation ${gen} 's simulation.`;
+
+  paused = false;
 }
 
 
@@ -398,4 +387,25 @@ function updateTextColor() {
   $(".bioColor").css("color", bio);
   var cult = $("Cultural").css("color");
   $(".cultColor").css("color", cult);
+}
+
+function fetchSimValues() {
+  bioIdeal = h2r(document.getElementById("Biological").value);
+  cultureIdeal = h2r(document.getElementById("Cultural").value);
+  var radioValue = $("input[name='model']:checked").val();
+  if (radioValue === 'darwin') {
+    Darwin = true;
+  } else {
+    Darwin = false;
+  }
+  radioValue = $("input[name='toward']:checked").val();
+  if (radioValue === 'bio') {
+    towardBio = true;
+  } else {
+    towardBio = false;
+  }
+  mutationRate = $("#mutationRate").val() / 100;
+  colorMutationRate = $("#colorMutRate").val() / 100;
+  colorChangeRate = $("#colorChangeRate").val() / 100;
+  numChanges = $("#numChanges").val() / 10 * 10;
 }

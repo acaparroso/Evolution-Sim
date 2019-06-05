@@ -46,3 +46,15 @@
     margin-top: 10px;
     margin-bottom: 40px;
 }
+
+.cultColor{
+  color: #FF00FF;
+}
+
+.bioColor{
+  color: #00FF00;
+}
+
+#Message{
+  font-size: 18pt;
+}

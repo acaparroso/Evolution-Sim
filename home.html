@@ -17,7 +17,7 @@
     <div>
         <p>
             In this simulation, the sims selected for reproduction are the "fittest" 
-            according to either <span class ="cultColor">Cultural fitness</span> or <span class="bioColor">Biological fitness?</span> <br>
+            according to <span class ="cultColor">Cultural fitness</span> or <span class="bioColor">Biological fitness?</span> <br>
             <input type="radio" name="toward" value="bio" checked><span class="bioColor">Biological Ideal</span> <br>
             <input type="radio" name="toward" value="cult"><span class ="cultColor">Cultural Ideal</span><br>
         </p>
@@ -34,6 +34,26 @@
         <div>Biological Ideal:<input type="color" id="Biological" class = "colorChange" value="#00FF00" size="7">
         </div>
         <div>Cultural Ideal: <input type="color" id="Cultural" class = "colorChange" value="#FF00FF" size="7"></div>
+        <p>
+            How often should sims mutate when being created?<br>
+            <input type="number" min="1"max="100" id="mutationRate" value="20">%
+        </p>
+        <p>
+            How much sould a mutation be allowed to change the color <br>
+            <input type="number" min = "1" max="100" id="colorMutRate" value = "10">%
+        </p>
+        <p>
+            how much should the color change every acquired change chance?<br>
+            <input type="number" min="1"    max="100" id="colorChangeRate" value = "0.4">%
+        </p>
+
+        <p>
+            How many acquired changes should every generation go through?<br>
+            <input type="number" min="1" max="1000" id="numChanges" value="300"> changes.
+        </p>
+        <p>
+
+        </p>
     </div>
 
     <script type='text/javascript'>
@@ -53,11 +73,10 @@
     <input id="runSim" class="highlightButton" type="button" value="Run Simulation >" onclick="simulate();">
     -------
     <input id="nextGen" class="lowlightedButton" value="Next Generation >>>" type="button" onclick="resumeSim()">
-    -------
-    <input id="stopSim" class="button" value="Stop Simulation ||" type="button" onclick="pauseSim()">
 </div>
-<canvas id="gameCanvas" width="1920" height="600"></canvas>
 <div id="Message">Waiting for start.</div>
+<canvas id="gameCanvas" width="1920" height="600"></canvas>
+
 <script src="evolutionSim.js"></script>
 
 
