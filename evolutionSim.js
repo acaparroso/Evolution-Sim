@@ -39,9 +39,9 @@ window.onload = function () {
 };
 
 // eslint-disable-next-line no-unused-vars
-function simulate() {
-  document.getElementById("Message").innerHTML = "Simulating...";
-  document.getElementById("runSim").classList = "button";
+function simulate(version = "") {
+  document.getElementById("Message"+version).innerHTML = "Simulating...";
+  document.getElementById("runSim"+version).classList = "button";
   paused = false;
   if (DE) {
     clearInterval(DE);
@@ -49,7 +49,7 @@ function simulate() {
     console.log('clearing');
     bots.length = 0;
   }
-  fetchSimValues();
+  fetchSimValues(version);
   gen = 0; chng = 0;
   // Instantiate the bots
   for (let i = 0; i < numBots; i += 1) {
@@ -123,11 +123,11 @@ function cycle() {
 
 
 // eslint-disable-next-line no-unused-vars
-function resumeSim() {
+function resumeSim(version = "") {
   CY = setInterval(cycle, 1000 / 60);
   DE = setInterval(drawEverything, 1000 / 60);
-  document.getElementById("nextGen").classList = "lowlightedButton";
-  document.getElementById("Message").innerHTML = `Starting Generation ${gen} 's simulation.`;
+  document.getElementById("nextGen"+version).classList = "lowlightedButton";
+  document.getElementById("Message"+version).innerHTML = `Starting Generation ${gen} 's simulation.`;
 
   paused = false;
 }
@@ -389,9 +389,9 @@ function updateTextColor() {
   $(".cultColor").css("color", cult);
 }
 
-function fetchSimValues() {
-  bioIdeal = h2r(document.getElementById("Biological").value);
-  cultureIdeal = h2r(document.getElementById("Cultural").value);
+function fetchSimValues(version) {
+  bioIdeal = h2r(document.getElementById("Biological"+version).value);
+  cultureIdeal = h2r(document.getElementById("Cultural"+version).value);
   var radioValue = $("input[name='model']:checked").val();
   if (radioValue === 'darwin') {
     Darwin = true;
@@ -404,8 +404,8 @@ function fetchSimValues() {
   } else {
     towardBio = false;
   }
-  mutationRate = $("#mutationRate").val() / 100;
-  colorMutationRate = $("#colorMutRate").val() / 100;
-  colorChangeRate = $("#colorChangeRate").val() / 100;
-  numChanges = $("#numChanges").val() / 10 * 10;
+  mutationRate = $("#mutationRate"+version).val() / 100;
+  colorMutationRate = $("#colorMutRate"+version).val() / 100;
+  colorChangeRate = $("#colorChangeRate"+version).val() / 100;
+  numChanges = $("#numChanges"+version).val() / 10 * 10;
 }
