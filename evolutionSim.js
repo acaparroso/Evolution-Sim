@@ -32,7 +32,7 @@ let towardBio = true;
 let paused = false;
 
 window.onload = function () {
-  canvas = document.getElementById("gameCanvas");
+  canvas = document.getElementById("gameCanvas1");
   canvasContext = canvas.getContext("2d");
   width = canvas.getAttribute("width");
   height = canvas.getAttribute("height");
@@ -40,8 +40,8 @@ window.onload = function () {
 
 // eslint-disable-next-line no-unused-vars
 function simulate(version = "") {
-  document.getElementById("Message"+version).innerHTML = "Simulating...";
-  document.getElementById("runSim"+version).classList = "button";
+  document.getElementById(`Message${version}`).innerHTML = "Simulating...";
+  document.getElementById(`runSim${version}`).classList = "button";
   paused = false;
   if (DE) {
     clearInterval(DE);
@@ -126,133 +126,10 @@ function cycle() {
 function resumeSim(version = "") {
   CY = setInterval(cycle, 1000 / 60);
   DE = setInterval(drawEverything, 1000 / 60);
-  document.getElementById("nextGen"+version).classList = "lowlightedButton";
-  document.getElementById("Message"+version).innerHTML = `Starting Generation ${gen} 's simulation.`;
+  document.getElementById(`nextGen${version}`).classList = "lowlightedButton";
+  document.getElementById(`Message${version}`).innerHTML = `Starting Generation ${gen} 's simulation.`;
 
   paused = false;
-}
-
-
-// Use this function to run the refresh rate and
-// the graphic logic. (What gets printed every x seconds)
-function drawEverything() {
-  canvasContext.fillStyle = 'white';
-  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-  // Draw bots on bot array
-  for (let i = 0; i < bots.length; i += 1) {
-    var color = bots[i].getColor();
-    drawCircle((i * 20) + 15, 20, botRadius, color);
-  }
-}
-
-
-// Circle with position x, y, radius r and whichever color. It has a black outline around it.
-function drawCircle(x, y, r, color) {
-  canvasContext.fillStyle = `rgb(${color[0]},${color[1]},${color[2]}`;
-  canvasContext.beginPath();
-  canvasContext.arc(x, y, r * 2, 0, 2 * Math.PI);
-  canvasContext.fill();
-  canvasContext.beginPath();
-  canvasContext.arc(x, y, r * 2, 0, 2 * Math.PI);
-  canvasContext.stroke();
-}
-
-
-// This is just a class to keep track of the bots in case we
-// add more functionalities to their behavior and changes later on.
-class Bot {
-  // This is used in case an ancestor is creating this bot.
-  // Mutation needs to be taken care of
-  // We are using the random color system, so we will
-  // use the current color related to the target color as the lerp variables.
-
-  constructor(x = 200, y = 200, DNAcolor = false, color = getRandomColor()) {
-    this.x = x; this.y = y; this.DNAcolor = DNAcolor;
-    if (DNAcolor === false) {
-      // This is used in case the bot is created without an ancestor.
-      this.color = color;
-      this.DNAcolor = this.color;
-      // Is it going to mutate?
-    } else if (Math.random() <= mutationRate) {
-      // This is used in case an ancestor is creating this bot.
-      // Mutation needs to be taken care of
-      // We are using the random color system,
-      // so we will use the current color related to the target color as the lerp variables.
-      console.log("Mutated!");
-      var amountChange = Math.random() * colorMutationRate;
-      // lerp with the current color as well, distance is lowered every time as well.
-      this.bioLerp = Math.min(amountChange, 1);
-      if (Darwin) {
-        // Interpolate between the DNA of the ancestor and bioIdeal
-        this.color = interpolateRGB(this.DNAcolor, bioIdeal, this.bioLerp);
-        this.DNAcolor = this.color;
-      } else {
-        // Interpolate between the color at death of the ancestor and bioIdeal
-        this.color = color;
-        this.color = interpolateRGB(this.color, bioIdeal, this.bioLerp);
-        this.DNAcolor = this.color;
-      }
-    } else {
-      this.color = this.DNAcolor;
-    }
-  }
-
-  update() {
-    var percentChange = (Math.random() * colorChangeRate);
-    // This lerp is done with the current color which means the distance is lowered every time.
-    this.cultureLerp = Math.min(percentChange, 1);
-    this.color = interpolateRGB(this.color, cultureIdeal, this.cultureLerp);
-  }
-
-  getFitness() {
-    this.fitness = calculateBioFitness(this.color, bioIdeal);
-    return this.fitness;
-  }
-
-  getCultureFitness() {
-    this.fitness = calculateCulturalFitness(this.color, cultureIdeal);
-    return this.fitness;
-  }
-
-  reproduce() {
-    const bot = new Bot(this.x, this.y, this.DNAcolor, this.color);
-    return bot;
-  }
-
-  getColor() {
-    return this.color;
-  }
-}
-
-// Take the target color and it's relative positioning
-// to the current colour to determine a fitness value
-function calculateBioFitness(c1, c2) {
-  return Math.abs(eDistance(c1, c2));
-}
-
-// Take the target color and it's relative positioning
-// to the current colour to determine a fitness value
-function calculateCulturalFitness(c1, c2) {
-  return Math.abs(eDistance(c1, c2));
-}
-
-// Returns a random color in an RGB array Credit : Paolo Forgia Stack Overflow.
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (let i = 0; i < 6; i += 1) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return h2r(color);
-}
-
-// Function returns the Euclidean distance between two colors (Given their RGB values as an array).
-function eDistance(p1, p2) {
-  var d = 0;
-  for (let i = 0; i < p1.length; i += 1) {
-    d += (p1[i] - p2[i]) * (p1[i] - p2[i]);
-  }
-  return Math.sqrt(d);
 }
 
 
@@ -390,8 +267,8 @@ function updateTextColor() {
 }
 
 function fetchSimValues(version) {
-  bioIdeal = h2r(document.getElementById("Biological"+version).value);
-  cultureIdeal = h2r(document.getElementById("Cultural"+version).value);
+  bioIdeal = h2r(document.getElementById(`Biological${version}`).value);
+  cultureIdeal = h2r(document.getElementById(`Cultural${version}`).value);
   var radioValue = $("input[name='model']:checked").val();
   if (radioValue === 'darwin') {
     Darwin = true;
@@ -404,8 +281,8 @@ function fetchSimValues(version) {
   } else {
     towardBio = false;
   }
-  mutationRate = $("#mutationRate"+version).val() / 100;
-  colorMutationRate = $("#colorMutRate"+version).val() / 100;
-  colorChangeRate = $("#colorChangeRate"+version).val() / 100;
-  numChanges = $("#numChanges"+version).val() / 10 * 10;
+  mutationRate = $(`#mutationRate${version}`).val() / 100;
+  colorMutationRate = $(`#colorMutRate${version}`).val() / 100;
+  colorChangeRate = $(`#colorChangeRate${version}`).val() / 100;
+  numChanges = $(`#numChanges${version}`).val() / 10 * 10;
 }
