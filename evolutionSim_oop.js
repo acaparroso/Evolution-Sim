@@ -191,7 +191,9 @@ class Simulation {
         var k = 0;
         for (let i = 0; i < numReplic; i += 1) {
           for (let j = 0; j < 4; j += 1) {
-            newGen[k] = GenReproduce[i].reproduce();
+            // mutationRate, colorMutationRate, Darwin, bioIdeal
+            newGen[k] = GenReproduce[i].reproduce(this.mutationRate,
+              this.colorMutationRate, this.Darwin, this.bioIdeal);
             k += 1;
           }
         }
@@ -299,8 +301,9 @@ class Bot {
     return this.fitness;
   }
 
-  reproduce() {
-    const bot = new Bot(this.x, this.y, this.DNAcolor, this.color);
+  reproduce(mutationRate, colorMutationRate, Darwin, bioIdeal) {
+    const bot = new Bot(this.x, this.y, this.DNAcolor, this.color,
+      mutationRate, colorMutationRate, Darwin, bioIdeal);
     return bot;
   }
 
